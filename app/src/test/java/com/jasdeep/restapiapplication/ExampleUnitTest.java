@@ -1,6 +1,6 @@
 package com.jasdeep.restapiapplication;
 
-//import static org.junit.Assert.*;
+import static org.junit.Assert.*;
 
 import org.testng.annotations.Test;
 
@@ -12,6 +12,6 @@ import org.testng.annotations.Test;
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
-//        assertEquals(4, 2 + 2);
+        assertEquals(4, 2 + 2);
     }
 }

@@ -41,7 +41,6 @@ public class LoginActivity extends AppCompatActivity {
         findViews();
         getUsers();
 
-
         mSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

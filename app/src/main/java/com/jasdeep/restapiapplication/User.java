@@ -12,6 +12,9 @@ public class User {
     private String name;
     private String username;
 
+    @SerializedName("email")
+    private String password;
+
     public int getUserId() {
         return userId;
     }
@@ -24,6 +27,14 @@ public class User {
         return username;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String pass) {
+        password = pass;
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -31,6 +42,7 @@ public class User {
                 "userId=" + userId +
                 ", name='" + name + '\'' +
                 ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
                 "}\n";
     }
 }

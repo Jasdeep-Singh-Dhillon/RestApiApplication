@@ -3,6 +3,7 @@ package com.jasdeep.restapiapplication;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -22,9 +23,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginActivity extends AppCompatActivity {
 
-    public static final String USER_KEY = "com.jasdeep.restapiapplication.USER_KEY";
-    public static final String USER_NAME = "com.jasdeep.restapiapplication.USERNAME";
-
     private EditText mUserName;
     private EditText mPassword;
     private Button mSignIn;
@@ -43,18 +41,33 @@ public class LoginActivity extends AppCompatActivity {
         findViews();
         getUsers();
 
+
         mSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                setPasswords();
                 getLoginInfo();
                 if (validateUser()) {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    intent.putExtra(USER_KEY, mUserIdVal);
-                    intent.putExtra(USER_NAME, mUserNameVal);
-                    startActivity(intent);
+                    startActivity(MainActivity.getIntent(getApplicationContext(), mUserIdVal, mUserNameVal));
                 }
             }
         });
+    }
+
+    private void setPasswords() {
+        if(mUsers == null) {
+            return;
+        }
+        for(User user: mUsers) {
+            user.setPassword("Password " + user.getUsername());
+        }
+    }
+
+    public static Intent getIntent(Context context, int userId, String username) {
+        Intent intent = new Intent(context, LoginActivity.class);
+        intent.putExtra(Util.USER_KEY, userId);
+        intent.putExtra(Util.USER_NAME, username);
+        return intent;
     }
 
     private void getUsers() {
@@ -71,8 +84,8 @@ public class LoginActivity extends AppCompatActivity {
         call.enqueue(new Callback<List<User>>() {
             @Override
             public void onResponse(@NonNull Call<List<User>> call, @NonNull Response<List<User>> response) {
-                if(!response.isSuccessful()) {
-                    Toast.makeText(getApplicationContext(), "Error Code: "+response.code(), Toast.LENGTH_LONG).show();
+                if (!response.isSuccessful()) {
+                    Toast.makeText(getApplicationContext(), "Error Code: " + response.code(), Toast.LENGTH_LONG).show();
                     return;
                 }
                 mUsers = response.body();
@@ -93,40 +106,47 @@ public class LoginActivity extends AppCompatActivity {
 
     private boolean validateUser() {
 
-        for(User user: mUsers) {
-            if(user.getUsername().equals(mUserNameVal)) {
+        for (User user : mUsers) {
+            if (user.getUsername().equals(mUserNameVal)) {
                 mUser = user;
                 break;
             }
         }
 
-
-        if(mUser == null) {
-            Toast.makeText(getApplicationContext(), "No user found", Toast.LENGTH_SHORT).show();
+        if (mUser == null) {
+            mUserName.setError("No user found");
             return false;
         }
 
         mUserIdVal = mUser.getUserId();
         if (mUserIdVal <= 0) {
-            Toast.makeText(getApplicationContext(), "Enter valid username", Toast.LENGTH_SHORT).show();
+            mUserName.setError("Invalid username");
             return false;
         }
         if (mPasswordVal.length() == 0) {
-            Toast.makeText(getApplicationContext(), "Enter valid password", Toast.LENGTH_SHORT).show();
+            mPassword.setError("Invalid password");
             return false;
         }
-        if(mPasswordVal.equals(mUser.getUsername()+"password")) {
+        if (mPasswordVal.equals(mUser.getPassword())) {
             return true;
         } else {
-            Toast.makeText(getApplicationContext(), "Incorrect Password", Toast.LENGTH_SHORT).show();
+            mPassword.setError("Incorrect Password");
             return false;
         }
 
     }
 
     private void getLoginInfo() {
-        mUserNameVal = mUserName.getText().toString();
+        mUserNameVal = getUsername();
 
-        mPasswordVal = mPassword.getText().toString();
+        mPasswordVal = getPassword();
+    }
+
+    private String getUsername() {
+        return mUserName.getText().toString();
+    }
+
+    private String getPassword() {
+        return mPassword.getText().toString();
     }
 }

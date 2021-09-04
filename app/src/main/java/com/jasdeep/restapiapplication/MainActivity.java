@@ -3,6 +3,7 @@ package com.jasdeep.restapiapplication;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,13 +34,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getUser() {
-        mUserId = getIntent().getIntExtra(LoginActivity.USER_KEY, -1);
-        mUsername = getIntent().getStringExtra(LoginActivity.USER_NAME);
+        mUserId = getIntent().getIntExtra(Util.USER_KEY, -1);
+        mUsername = getIntent().getStringExtra(Util.USER_NAME);
         if (mUserId == -1 | mUsername == null) {
-            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-            intent.putExtra(LoginActivity.USER_KEY, -1);
-            intent.putExtra(LoginActivity.USER_NAME, "");
-            startActivity(intent);
+            startActivity(LoginActivity.getIntent(getApplicationContext(), -1, null));
         }
     }
 
@@ -87,9 +85,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-        intent.putExtra(LoginActivity.USER_KEY, -1);
-        intent.putExtra(LoginActivity.USER_NAME, "");
-        startActivity(intent);
+        startActivity(LoginActivity.getIntent(getApplicationContext(), -1, ""));
+    }
+
+    public static Intent getIntent(Context context, int userId, String username) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.putExtra(Util.USER_KEY, userId);
+        intent.putExtra(Util.USER_NAME, username);
+        return intent;
     }
 }
